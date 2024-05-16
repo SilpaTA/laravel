@@ -60,7 +60,7 @@ class NoteController extends Controller
             'title'=> $request->title,
             'content'=> $request->content
         ]);
-        return redirect()->route('notes.index');
+        return redirect()->route('notes.index')->with('success', 'Note Added Successfully');
 
 
         // $note = new Notes ([
@@ -99,9 +99,12 @@ class NoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Notes $note)
     {
-        //
+        if($note->user_id != Auth::id()){
+            return abort(403);
+        }
+        return view('notes.edit')->with('notes', $note)->with('success', 'Note Edited Successfully');
     }
 
     /**
@@ -111,9 +114,22 @@ class NoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Notes $note )
     {
-        //
+        if($note->user_id != Auth::id()){
+            return abort(403);
+        }
+        $request->validate([
+            'title' => 'required|max:200',
+            'content' =>'required'
+        ]);
+
+        $note->update ([
+            
+            'title'=> $request->title,
+            'content'=> $request->content
+        ]);
+        return redirect()->route('notes.show', $note)->with('success', 'Note Updated Successfully');
     }
 
     /**
@@ -122,8 +138,13 @@ class NoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Notes $note)
     {
-        //
+        if($note->user_id != Auth::id()){
+            return abort(403);
+        }
+
+        $note->delete();
+        return redirect()->route('notes.index', $note)->with('success', 'Note Deleted Successfully');
     }
 }
