@@ -88,13 +88,13 @@ class NoteController extends Controller
      public function show(Notes $note)
     {
         // $note = Notes::where('uuid',$uuid)->where('user_id',Auth::id())->firstOrFail();
-        // if($note->user_id != Auth::id()){
-        //     return abort(403);
-        // }
-
-        if($note->user->is(Auth::user())){ //Checking primary keys of two tables
+        if($note->user_id != Auth::id()){
             return abort(403);
         }
+
+        // if($note->user->is(Auth::user())){ //Checking primary keys of two tables
+        //     return abort(403);
+        // }
         return view('notes.show')->with('notes', $note);
     }
 
@@ -156,6 +156,6 @@ class NoteController extends Controller
         }
 
         $note->delete();
-        return redirect()->route('notes.index', $note)->with('success', 'Note Deleted Successfully');
+        return redirect()->route('notes.index', $note)->with('success', 'Note Moved to Trash');
     }
 }

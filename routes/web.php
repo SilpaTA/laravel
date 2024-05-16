@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\TrashedNotesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +24,12 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::resource('/notes', NoteController::class)->middleware(['auth']);
+Route::get('/trashed', [TrashedNotesController::class, 'index'])
+        ->middleware('auth')->name('trashed.index');
 
+Route::get('/trashed/{note}', [TrashedNotesController::class, 'show'])
+        ->withTrashed()
+        ->middleware('auth')->name('trashed.show');
 require __DIR__.'/auth.php';
 // Route::get('/notes',);
 // Route::get('/notes'/'{note}',);
