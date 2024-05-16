@@ -22,8 +22,14 @@ class NoteController extends Controller
     {
         // $userId = Auth::id();
         // $notes = Notes::where('user_id', Auth::id())->latest('updated_at')->get();//get all data from database
-        $notes = Notes::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+        
+        // $notes = Notes::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+
+        // $notes = Auth::user()->notes()->latest('updated_at')->paginate(5); //Elequent relationship querying 
+        $notes = Notes::whereBelongsTo(Auth::user())->latest('updated_at')->paginate(5); //Inverse relationships
         return view('notes.index')->with('notes', $notes);
+        
+        
         // $notes->each(function($notes){
         //     dump($notes->title);
 
@@ -53,10 +59,11 @@ class NoteController extends Controller
             'title' => 'required|max:200',
             'content' =>'required'
         ]);
-
-        Notes::create ([
+        Auth::user()->notes()->create([
+        
+        // Notes::create ([
             'uuid'=>Str::uuid(),
-            'user_id' => Auth::id(),
+            // 'user_id' => Auth::id(),
             'title'=> $request->title,
             'content'=> $request->content
         ]);
@@ -81,7 +88,11 @@ class NoteController extends Controller
      public function show(Notes $note)
     {
         // $note = Notes::where('uuid',$uuid)->where('user_id',Auth::id())->firstOrFail();
-        if($note->user_id != Auth::id()){
+        // if($note->user_id != Auth::id()){
+        //     return abort(403);
+        // }
+
+        if($note->user->is(Auth::user())){ //Checking primary keys of two tables
             return abort(403);
         }
         return view('notes.show')->with('notes', $note);
