@@ -20,5 +20,7 @@ class TrashedNotesController extends Controller
 
         return view('notes.show')->with('note', $note);
     }
+
+    
     
 }
